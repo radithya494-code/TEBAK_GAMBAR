@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tebak Gambar 100 Level</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            text-align: center;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            padding: 20px;
+            color: white;
+        }
+
+        .box {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            margin: auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        img {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+
+        #menu, #game, #shop, #ads, #character { display: none; }
+
+        #ads {
+            background: yellow;
+            color: black;
+            padding: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="menu" class="box">
+    <h1>🎮 Tebak Gambar 100 Level</h1>
+    <input type="text" id="player" placeholder="Masukkan nama kamu"><br>
+    <button onclick="chooseCharacter()">Pilih Karakter</button>
+    <button onclick="startGame()">Mulai Game</button>
+    <button onclick="openShop()">Shop</button>
+</div>
+
+<div id="character" class="box">
+    <h2>Pilih Karakter</h2>
+    <button onclick="selectChar('😎')">😎</button>
+    <button onclick="selectChar('🤖')">🤖</button>
+    <button onclick="selectChar('👨‍🚀')">👨‍🚀</button>
+    <button onclick="selectChar('🐱')">🐱</button>
+</div>
+
+<div id="shop" class="box">
+    <h2>🛒 Shop</h2>
+    <p>Koin: <span id="coin">0</span></p>
+    <button onclick="buyLife()">Beli Nyawa (10 Koin)</button><br>
+    <button onclick="backMenu()">Kembali</button>
+</div>
+
+<div id="ads">📢 IKLAN: Main game bikin pintar!</div>
+
+<div id="game" class="box">
+    <h3 id="playerName"></h3>
+    <h1 id="char"></h1>
+    <p>Level: <span id="level">1</span></p>
+    <p>Skor: <span id="score">0</span></p>
+    <p>Nyawa: <span id="life">3</span></p>
+    <p>Koin: <span id="coin2">0</span></p>
+    <p>Waktu: <span id="time">15</span></p>
+
+    <img id="gambar" src=""><br>
+    <input type="text" id="answer" placeholder="Jawaban">
+    <br>
+    <button onclick="checkAnswer()">Jawab</button>
+
+    <p id="info"></p>
+</div>
+
+<script>
+let level = 1;
+let score = 0;
+let life = 3;
+let coin = 0;
+let time = 15;
+let timer;
+let playerName = "";
+let character = "";
+
+const gameData = [
+{img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg", answer:"kucing"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Red_Apple.jpg", answer:"apel"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg", answer:"pisang"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Push_bicycle.jpg", answer:"sepeda"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_of_a_dog.jpg", answer:"anjing"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/3/32/House_sparrow04.jpg", answer:"burung"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/f/fb/Orange-Fruit-Pieces.jpg", answer:"jeruk"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Ice_Cream_dessert_02.jpg", answer:"eskrim"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/0/0d/LARGE_elevation.jpg", answer:"matahari"},
+{img:"https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg", answer:"burung"}
+];
+
+function chooseCharacter() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("character").style.display = "block";
+}
+
+function selectChar(c) {
+    character = c;
+    document.getElementById("character").style.display = "none";
+    document.getElementById("menu").style.display = "block";
+}
+
+function startGame() {
+    playerName = document.getElementById("player").value;
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("game").style.display = "block";
+    document.getElementById("ads").style.display = "block";
+    document.getElementById("playerName").innerText = "Pemain: " + playerName;
+    document.getElementById("char").innerText = character;
+    loadLevel();
+    startTimer();
+}
+
+function openShop() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("shop").style.display = "block";
+    document.getElementById("coin").innerText = coin;
+}
+
+function backMenu() {
+    document.getElementById("shop").style.display = "none";
+    document.getElementById("menu").style.display = "block";
+}
+
+function buyLife() {
+    if(coin >= 10) {
+        coin -= 10;
+        life++;
+        alert("Nyawa bertambah!");
+    } else {
+        alert("Koin tidak cukup!");
+    }
+}
+
+function loadLevel() {
+    document.getElementById("level").innerText = level;
+    document.getElementById("score").innerText = score;
+    document.getElementById("life").innerText = life;
+    document.getElementById("coin2").innerText = coin;
+    document.getElementById("gambar").src = gameData[level-1].img;
+}
+
+function startTimer() {
+    time = 15;
+    document.getElementById("time").innerText = time;
+    timer = setInterval(function() {
+        time--;
+        document.getElementById("time").innerText = time;
+        if(time == 0) {
+            life--;
+            if(life == 0) gameOver();
+            nextLevel();
+        }
+    }, 1000);
+}
+
+function checkAnswer() {
+    let userAnswer = document.getElementById("answer").value.toLowerCase();
+    let correctAnswer = gameData[level-1].answer;
+
+    if(userAnswer === correctAnswer) {
+        score += 10;
+        coin += 5;
+        nextLevel();
+    } else {
+        life--;
+        if(life == 0) gameOver();
+    }
+
+    document.getElementById("answer").value = "";
+}
+
+function nextLevel() {
+    clearInterval(timer);
+    level++;
+    if(level > gameData.length) {
+        alert("Kamu Menang!");
+        location.reload();
+    } else {
+        loadLevel();
+        startTimer();
+    }
+}
+
+function gameOver() {
+    alert("Game Over! Skor: " + score);
+    location.reload();
+}
+
+document.getElementById("menu").style.display = "block";
+</script>
+
+</body>
+</html>
